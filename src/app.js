@@ -7,7 +7,7 @@ import ReactDOMServer from 'react-dom/server';
 // NOTE: Initializing it here will initialize it also for app.test.js
 import 'react-dates/initialize';
 import Helmet from 'react-helmet';
-import { BrowserRouter, StaticRouter } from 'react-router-dom';
+import { BrowserRouter, HashRouter, StaticRouter } from 'react-router-dom';
 import { Provider } from 'react-redux';
 import difference from 'lodash/difference';
 import mapValues from 'lodash/mapValues';
@@ -91,17 +91,40 @@ export class ClientApp extends Component {
   render() {
     const { store } = this.props;
     setupLocale();
-    return (
-      <IntlProvider locale={config.locale} messages={localeMessages}>
-        <Provider store={store}>
-          <BrowserRouter>
-            <Routes routes={routeConfiguration()} />
-          </BrowserRouter>
-        </Provider>
-      </IntlProvider>
-    );
+    if(!window.cordova) {
+      /*Uses Browser Router*/
+      return (
+        <IntlProvider locale={config.locale} messages={localeMessages}>
+          <Provider store={store}>
+            <BrowserRouter>
+              <Routes routes={routeConfiguration()} />
+            </BrowserRouter>
+          </Provider>
+        </IntlProvider>
+      );
+
+    } else {
+      /*if it is a Cordova application, Uses Hash Router*/
+      return (
+        <IntlProvider locale={config.locale} messages={localeMessages}>
+          <Provider store={store}>
+            <HashRouter>
+              <Routes routes={routeConfiguration()} />
+            </HashRouter>
+          </Provider>
+        </IntlProvider>
+      );
+      
+    }
   }
 }
+
+/*
+       <BrowserRouter>
+          <Routes routes={routeConfiguration()} />
+        </BrowserRouter>
+        <HashRouter basename="/"/>
+*/
 
 const { any, string } = PropTypes;
 
